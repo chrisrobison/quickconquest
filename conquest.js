@@ -695,7 +695,7 @@ function uiPickMove(player, state, reportMoveCallback) {
             var level = (temple.u == upgrade) ? (temple.l+1) : ((upgrade == SOLDIER) ? (state.m.h || 0) : 0);
 
             var cost = upgrade.c[level];
-            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "&#9775;)");
+            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "&#9733;)");
             var description = template(upgrade.d, upgrade.x[level]);
 
             var hidden = false;
@@ -987,11 +987,11 @@ function updateIngameUI(gameState) {
         var gameWinner = gameState.e;
 
         if (regions) {
-            $('pr' + index).innerHTML = regionCount(gameState, player) + '&#9733;'; // region count
+            $('pr' + index).innerHTML = regionCount(gameState, player) + '&#9873;'; // region count
             if (gameWinner) {
                 $('pc' + index).innerHTML = (gameWinner == player) ? '&#9819;' : '';
             } else {
-                $('pc' + index).innerHTML = gameState.c[player.i] + '&#9775;'; // cash on hand
+                $('pc' + index).innerHTML = gameState.c[player.i] + '&#9733;'; // cash on hand
             }
         } else {
             $('pr' + index).innerHTML = '&#9760;'; // skull and crossbones, you're dead
@@ -1014,7 +1014,7 @@ function updateIngameUI(gameState) {
         } else {
 
             info = elem('p', {}, 'Click on a region to move or attack with its army.') +
-                elem('p', {}, 'Click on a temple to buy soldiers or upgrades with &#9775;.');
+                elem('p', {}, 'Click on a temple to buy soldiers or upgrades with &#9733;.');
         }
     } else {
         info = elem('p', {}, active.n + ' is taking her turn.');
@@ -1025,7 +1025,7 @@ function updateIngameUI(gameState) {
     // active player stats
     $('pd').style.display =  buildingMode ? 'none' : 'block';
     $('mc').innerHTML = moveState.l + elem('span', {s: 'font-size: 80%'}, '&#10138;');
-    $('ft').innerHTML = gameState.c[active.i] +  elem('span', {s: 'font-size: 80%'}, '&#9775;');
+    $('ft').innerHTML = gameState.c[active.i] +  elem('span', {s: 'font-size: 80%'}, '&#9733;');
 
     // buttons
     updateButtons(decisionState && decisionState.b);
@@ -1897,7 +1897,7 @@ function nextTurn(state) {
     var playerIncome = income(state, player);
     state.c[player.i] += playerIncome;
     if (playerIncome) {
-        state.flt = [{r: temples(state, player)[0].r, t: "+" + playerIncome + "&#9775;", c: '#fff', w: 5}];
+        state.flt = [{r: temples(state, player)[0].r, t: "+" + playerIncome + "&#9733;", c: '#fff', w: 5}];
     }
 
 	// temples produce one soldier per turn automatically
