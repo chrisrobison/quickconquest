@@ -402,8 +402,8 @@ function transformPoints(points, xm, ym, xd, yd) {
 // 3d projection for the map
 function projectPoint(p) {
 	var x = p[0] / mapWidth, y = p[1] / mapHeight;
-	var alpha = x * .4 + .6;
-	y = y * alpha + 0.5 * (1-alpha);
+	var alpha = x * 0 + 1;
+	y = y * alpha + .5 * (1-alpha);
 	return [x*100, y*100];
 }
 
@@ -551,7 +551,7 @@ function prepareIngameUI(gameState) {
     $('d').innerHTML = html;
 
     // show stat box and undo button
-    map(['mv', 'und', 'end'], show);
+    map(['mv', 'undo', 'end'], show);
 }
 
 // ==========================================================
@@ -695,7 +695,7 @@ function uiPickMove(player, state, reportMoveCallback) {
             var level = (temple.u == upgrade) ? (temple.l+1) : ((upgrade == SOLDIER) ? (state.m.h || 0) : 0);
 
             var cost = upgrade.c[level];
-            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "&#9733;)");
+            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "<span class='gold'>&#11044;</span>)");
             var description = template(upgrade.d, upgrade.x[level]);
 
             var hidden = false;
@@ -2134,7 +2134,7 @@ function storeSetupInLocalStorage() {
 
 function prepareSetupUI() {
     // player box area
-    var html = div({c: 'sc ds'}, "Player setup");
+    var html = div({c: 'sc ds'}, "Game Setup");
     var playerBoxes = map(PLAYER_TEMPLATES, function(player) {
         var pid = player.i;
         return buttonPanel(player.n, "sb" + player.i, ["AI", "Human", "Off"], {
@@ -2151,7 +2151,7 @@ function prepareSetupUI() {
     $('d').innerHTML = html;
 
     // hide stat box and undo button
-    map(['mv', 'und', 'end'], hide);
+    map(['mv', 'undo', 'end'], hide);
 
     // setup callbacks for players
     for2d(0, 0, PLAYER_TEMPLATES.length, 3, function(playerIndex, buttonIndex) {
@@ -2265,15 +2265,15 @@ function runSetupScreen() {
 // ==========================================================
 
 function setupTitleScreen() {
-    map(['o','tub','snd'], function(id) {showOrHide(id,1);});
+    map(['o','hlp','snd'], function(id) {showOrHide(id,1);});
 
     onClickOrTap($('cb'), setTitleScreenVisibility.bind(0,false));
     onClickOrTap($('nxt'), switchTutorialCard.bind(0,1));
     onClickOrTap($('prv'), switchTutorialCard.bind(0,-1));
 
-    onClickOrTap($('tub'), setTitleScreenVisibility.bind(0,true));
+    onClickOrTap($('hlp'), setTitleScreenVisibility.bind(0,true));
     onClickOrTap($('snd'), toggleSound);
-    onClickOrTap($('und'), invokeUICallback.bind(0, 0, 'un'));
+    onClickOrTap($('undo'), invokeUICallback.bind(0, 0, 'un'));
     onClickOrTap($('end'), function() {
         uiCallbacks = {};
         updateDisplay(displayedState);
