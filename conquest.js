@@ -402,8 +402,8 @@ function transformPoints(points, xm, ym, xd, yd) {
 // 3d projection for the map
 function projectPoint(p) {
 	var x = p[0] / mapWidth, y = p[1] / mapHeight;
-	var alpha = x * 0 + 1;
-	y = y * alpha + .5 * (1-alpha);
+	var alpha = x * 0.05 + 1;
+	y = y * alpha + 0.5 * (1-alpha);
 	return [x*100, y*100];
 }
 
@@ -695,7 +695,7 @@ function uiPickMove(player, state, reportMoveCallback) {
             var level = (temple.u == upgrade) ? (temple.l+1) : ((upgrade == SOLDIER) ? (state.m.h || 0) : 0);
 
             var cost = upgrade.c[level];
-            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "<span class='gold'>&#11044;</span>)");
+            var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "<span class='gold'></span>)");
             var description = template(upgrade.d, upgrade.x[level]);
 
             var hidden = false;
@@ -991,7 +991,7 @@ function updateIngameUI(gameState) {
             if (gameWinner) {
                 $('pc' + index).innerHTML = (gameWinner == player) ? '&#9819;' : '';
             } else {
-                $('pc' + index).innerHTML = gameState.c[player.i] + '&#9733;'; // cash on hand
+                $('pc' + index).innerHTML = gameState.c[player.i] + '<span style="transform:scale(0.7);" class="gold"></span>'; // cash on hand
             }
         } else {
             $('pr' + index).innerHTML = '&#9760;'; // skull and crossbones, you're dead
@@ -1014,7 +1014,7 @@ function updateIngameUI(gameState) {
         } else {
 
             info = elem('p', {}, 'Click on a region to move or attack with its army.') +
-                elem('p', {}, 'Click on a temple to buy soldiers or upgrades with &#9733;.');
+                elem('p', {}, 'Click on a temple to buy soldiers or upgrades with <span class="gold"></span>.');
         }
     } else {
         info = elem('p', {}, active.n + ' is taking her turn.');
@@ -1025,13 +1025,13 @@ function updateIngameUI(gameState) {
     // active player stats
     $('pd').style.display =  buildingMode ? 'none' : 'block';
     $('mc').innerHTML = moveState.l + elem('span', {s: 'font-size: 80%'}, '&#10138;');
-    $('ft').innerHTML = gameState.c[active.i] +  elem('span', {s: 'font-size: 80%'}, '&#9733;');
+    $('ft').innerHTML = gameState.c[active.i] +  elem('span', {s: 'font-size: 80%'}, '<span style="top:6px" class="gold"></span>');
 
     // buttons
     updateButtons(decisionState && decisionState.b);
 
     // undo
-    $('und').innerHTML = undoEnabled(gameState) ? "&#x21b6;" : "";
+    $('undo').innerHTML = undoEnabled(gameState) ? "&#x21b6;" : "";
 }
 
 function updateButtons(buttons) {
@@ -1042,7 +1042,7 @@ function updateButtons(buttons) {
         var buttonContents = div({}, button.t);
         if (button.d)
             buttonContents += div({c: 'ds'}, button.d);
-
+        
         var buttonHTML = elem('a', {href: '#', c: button.o ? 'off' : ''}, buttonContents);
         var buttonNode = append('u', buttonHTML);
         if (!button.o) {
@@ -1897,7 +1897,7 @@ function nextTurn(state) {
     var playerIncome = income(state, player);
     state.c[player.i] += playerIncome;
     if (playerIncome) {
-        state.flt = [{r: temples(state, player)[0].r, t: "+" + playerIncome + "&#9733;", c: '#fff', w: 5}];
+        state.flt = [{r: temples(state, player)[0].r, t: "+" + playerIncome + "<span class='gold'></span>", c: '#fff', w: 5}];
     }
 
 	// temples produce one soldier per turn automatically
@@ -2095,7 +2095,7 @@ function performUndo(currentState) {
 }
 
 // ==========================================================
-// This is the code for the game setup screen.
+// Game setup screen.
 // ==========================================================
 
 var defaultSetup = {
@@ -2191,7 +2191,37 @@ function runSetupScreen() {
     // callback for the buttons on the bottom
     uiCallbacks.b = function(which) {
         if (!setupValid()) return;
+
         if (which == 0) {
+           if (!window.fblogin) { 
+              FB.login(function(response) {
+                 if (response.authResponse) {
+                    fb_authResponse = Object.assign({}, response.authResponse);
+                    window.fblogin = true;
+                    $('u').childNodes[0].childNodes[0].innerHTML = "Invite Friends";
+                    updateBottomButtons();
+                    FB.api('/me?fields=name,first_name,last_name,email,picture.width(250).height(250)', function(response) {
+                       // document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '! <img src="'+response.picture.data.url+'">';
+                       window.player = response;
+                       $("pl0").innerHTML = $("pl0").innerHTML.replace(/Amber/, response.first_name);
+                       PLAYER_TEMPLATES[0].n = response.first_name;
+                    });
+                 }
+              },{scope:"email,user_friends"});
+           } else {
+              FB.ui(
+                 {
+                    method: 'apprequests',
+                    message: 'I challenge you to a quick conflict. I was hesitant to challenge you at first, but I know you will rise up to the challenge.'
+                 }, function(response){
+                    console.log(response);
+                 }
+              );
+           }
+        } else if (which == 1) {
+           // TODO: Popup fb friend picker here
+
+        } else if (which == 2) {
             regenerateMap();
         } else {
             prepareIngameUI(game);
@@ -2227,8 +2257,10 @@ function runSetupScreen() {
     function updateBottomButtons() {
         var buttonsDisabled = !setupValid();
         updateButtons([
-            {t: "Change map", o: buttonsDisabled},
-            {t: "Start game", o: buttonsDisabled}
+            {t: (window.fblogin) ? "Invite Friends" : "Login with Facebook", o: buttonsDisabled},
+            {t: "Play a Friend", o: !window.fblogin},
+            {t: "Change Map", o: buttonsDisabled},
+            {t: "Start Game", o: buttonsDisabled}
         ]);
     }
 
@@ -2260,7 +2292,7 @@ function runSetupScreen() {
 }
 
 // ==========================================================
-// This part of the code is responsible for the meager functionality
+// This part of the code is responsible for the pathetic functionality
 // of the title screen.
 // ==========================================================
 
@@ -2282,7 +2314,7 @@ function setupTitleScreen() {
 
     switchTutorialCard(0);
 
-    setTimeout(setTitleScreenVisibility.bind(0,true), 10);
+//    setTimeout(setTitleScreenVisibility.bind(0,true), 10);
 }
 
 var currentCard = 0, totalCards = 5;

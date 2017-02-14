@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Black+Ops+One|Iceland');
+@import url('https://fonts.googleapis.com/css?family=Special+Elite|Iceland');
 body {
    background: #000;
    height: 100%;
@@ -94,7 +94,7 @@ svg {
 }
 /* additional information displayed inside the box */
 .ad {
-   float: right; width: 21%; text-align: right; margin: -0.2em 0.2em 0 0; font-size: 120%;
+   float: right; width: 23%; text-align: right; margin: -0.2em 0.2em 0 0; font-size: 120%;
 }
 
 /* Buttons */
@@ -322,11 +322,11 @@ a:hover {
   }
   #ts a:hover, a.rb:hover { transform: translate3d(0,0,0.2em); opacity: 1 !important; }
   h1 {
-      font-family: "Constantia", "Athelas", serif;
+      font-family: "Special Elite", "Athelas", serif;
       font-size: 3.75em;
       margin: 0.7em 0 1em;
-      transform: scale3d(1.5,1.5,1) rotateX(60deg);
-      -webkit-transform: scale3d(1.5,1.5,1) rotateX(60deg);
+  /*    transform: scale3d(1.5,1.5,1) rotateX(60deg);
+      -webkit-transform: scale3d(1.5,1.5,1) rotateX(60deg);*/
       text-shadow: 0 0.04em #777;
   }
   h1, h2 {
@@ -348,8 +348,13 @@ a:hover {
       color: #ffa;
   }
   .gold {
-      color: #ffd700;
-      text-shadow: 2px 2px 0px #ff0, -2px -2px 0px #ff0, 2px -2px 0px #ff0, -2px 2px 0px #ff0, 0px 2px 0px #ff0, 0px -2px 0px #ff0;
-      -webkit-text-stroke: 1px rgba(255,255,255,.7);
+      display:inline-block;
+      width:32px;
+      height:32px;
+      background: url(img/gold.gif) no-repeat;
+      position:relative;
+      margin-top:-14px;
+      top:10px;
+      left:7px;
   }
 
