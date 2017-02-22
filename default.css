@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Special+Elite|Iceland');
 body {
    background: #000;
+	background-image: url(img/water2.gif);
    height: 100%;
    margin: 0;
    font-family: sans-serif;
@@ -36,7 +37,9 @@ svg {
 #m {
    right: 0; left: 20%; top: 0; bottom: 0;
 }
-
+.v,.w {
+	background:rgba(0,0,0,.7);
+}
 /* Board elements */
 .o,.i,.s {
   border: 1px solid black;
@@ -46,8 +49,9 @@ svg {
 .o {
   width: 3%;
   height: 4%;
-  transform: rotate(10deg);
+/*  transform: rotate(10deg); 
     -webkit-transform: rotate(10deg);
+*/
 }
 .i {
   width: 90%;
@@ -94,7 +98,7 @@ svg {
 }
 /* additional information displayed inside the box */
 .ad {
-   float: right; width: 23%; text-align: right; margin: -0.2em 0.2em 0 0; font-size: 120%;
+   float: right; width: 30%; text-align: right; margin: -0.2em 0.2em 0 0; font-size: 120%;white-space:nowrap;
 }
 
 /* Buttons */
@@ -357,4 +361,7 @@ a:hover {
       top:10px;
       left:7px;
   }
-
+.castle {
+	margin-left:-0.8em;
+	margin-top:-2.2em;;
+}
