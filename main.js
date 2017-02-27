@@ -1665,6 +1665,7 @@ function playOneMove(state) {
             } else {
                 // remember state for undo purposes
                 previousState = copyState(state);
+console.dir(previousState);
                 // still more of the game to go - next move, please!
                 setTimeout(playOneMove.bind(0, newState), 1);
             }

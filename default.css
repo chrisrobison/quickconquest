@@ -23,7 +23,7 @@ svg {
 }
 #o {
    left: 0%; right: 79.9%;
-   top: 0%; bottom: 13.5%;
+   top: 0%; bottom: 0%;
    color: white;
    /* transform: rotateY(55deg);
       -webkit-transform: rotateY(55deg);
@@ -362,6 +362,7 @@ a:hover {
       left:7px;
   }
 .castle {
-	margin-left:-0.8em;
-	margin-top:-2.2em;;
+	margin-top:-0.8em;
+	width:48px;
+	height:48px;
 }
