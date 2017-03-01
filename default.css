@@ -366,3 +366,15 @@ a:hover {
 	width:48px;
 	height:48px;
 }
+.fort {
+	margin-top:-0.8em;
+	width:64px;
+	height:64px;
+	margin-left:-0.6em;
+}
+.fortress {
+	margin-top:-0.7em;
+	width:64px;
+	height:64px;
+	margin-left:-0.6em;
+}

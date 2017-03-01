@@ -853,14 +853,25 @@ function updateMapDisplay(gameState) {
 
         // right color and right number of levels (corresponding to upgrade level)
         var templeLevels = temple.u ? (temple.l + 3) : 2;
-        while (element) {
+		  console.log("Temple Level: "+templeLevels);
+		  console.dir(temple.e);
+		  var imgs = ['castle', 'fort', 'fortress'];
+		  element = temple.e.firstChild;
+		  element.src = 'img/' + imgs[templeLevels - 2] + '.png';
+		  element.classList.remove("castle");
+		  element.classList.remove("fort");
+		  element.classList.remove("fortress");
+		  element.classList.add(imgs[templeLevels - 2]);
+
+        /*
+		  while (element) {
             element.style.display = (templeLevels > 0) ? 'block' : 'none';
             // element.style.background = temple.u ? temple.u.b : '#999';
 
             templeLevels--;
             element = element.firstChild;
         }
-
+		  */
         // which cursor should we use?
         var templeOwner = owner(gameState, temple.r);
         temple.e.style.cursor = (appState == APP_INGAME) ? ((templeOwner == activePlayer(gameState)) ? 'zoom-in' : 'help') : 'default';
