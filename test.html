@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        header {
+            background-color: #999;
+            color: #eee;
+            height: 5vh;
+        }
+
+        main {
+            background-color: #333;
+            color: #ddd;
+            height: 90vh;
+        }
+
+        footer {
+            background-color: #666;
+            color: #eee;
+            height: 5vh;
+        }
+    </style>
+</head>
+
+<body id="home">
+    <header>
+    </header>
+    <main>
+        <div id='firebaseui-auth-container'></div>
+        <div id='loader'>Loading...</div>
+    </main>
+    <footer>
+    </footer>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+             https://firebase.google.com/docs/web/setup#available-libraries -->
+             <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-auth.js"></script>
+             <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-database.js"></script>
+             <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-analytics.js"></script>
+             <script src="https://www.gstatic.com/firebasejs/8.2.5/firebase-messaging.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDQqL_95flNZnhx4MH3aTxQvqdc6mC5icI",
+            authDomain: "quick-conquest.firebaseapp.com",
+            databaseURL: "https://quick-conquest.firebaseio.com",
+            projectId: "quick-conquest",
+            storageBucket: "quick-conquest.appspot.com",
+            messagingSenderId: "566153776201",
+            appId: "1:566153776201:web:a14163d821614a198b4398"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+    <script>
+        function $(str) {
+            return document.querySelector(str);
+        }
+
+        function $$(str) {
+            return document.querySelectorAll(str);
+        }
+
+        (function() {
+            const app = {
+                init: function() {
+                    app.state.loaded = true;
+                    app.ui = new firebaseui.auth.AuthUI(firebase.auth());
+                    app.ui.start('#firebaseui-auth-container', {
+                        callbacks: {
+                            signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                                // User successfully signed in.
+                                // Return type determines whether we continue the redirect automatically
+                                // or whether we leave that to developer to handle.
+                                return true;
+                            },
+                            uiShown: function() {
+                                // The widget is rendered.
+                                // Hide the loader.
+                                document.getElementById('loader').style.display = 'none';
+                            }
+                        },
+                        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+                        signInFlow: 'popup',
+                        signInSuccessUrl: 'https://quickconquest.com/game.html',
+                        signInOptions: [
+                            // List of OAuth providers supported.
+                            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                            firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+                            {
+                                provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                                requireDisplayName: false
+                            }
+                        ],
+                        tosUrl: 'https://quickconquest.com/privacy-tos/tos.html',
+                        privacyPolicyUrl: 'https://quickconquest.com/privacy-tos/privacy.html'
+                    });
+                },
+                state: {
+                    loaded: false
+                }
+            }
+            window.app = app;
+            app.init();
+        })();
+    </script>
+</body>
+
+</html>

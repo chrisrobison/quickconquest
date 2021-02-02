@@ -2,7 +2,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Quick Qonquest</title>
-	 <link rel="stylesheet" type="text/css" href="default.css"/>
+    <link rel="stylesheet" type="text/css" href="default.css"/>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
 </head>
 <body>
 <div id='c'>
@@ -42,7 +44,7 @@
                         <li>The standard game lasts <b>12 turns</b>.</li>
                         <li>Once time runs out, <b>whoever has most territories, wins</b>.</li>
                         <li>Your <b>soldiers</b> conquer and defend <b>territories</b>.</li>
-                        <li>Your <b>forts</b> generate new soldiers each turn and can be <b>upgraded</b> with gold.</li>
+                        <li>Your <b>castles</b> generate new soldiers each turn and can be <b>upgraded</b> with gold.</li>
                         <li>You earn <b>gold</b>(<span class='gold'></span>) for territories and for soldiers stationed at forts.</li>
                     </ul>
                 </div>
@@ -115,34 +117,29 @@
     <a id="snd" href="#" style="right: 10.4%" class="cb rb" title="Sound"></a>
     <a id="undo" href="#" style="right: 15.1%" class="cb rb" title="Undo"></a>
 </div>
+<div id='status'></div>
+<div id="fb-root"></div>
 <script src="main.js"></script>
-   <script>
-   // Facebook login stuff
-   (function(d, s, id) {
+<script>
+window.fbAsyncInit = function() {
+    FB.init({
+        appId      : '1848776875399776',
+        xfbml      : true,
+        version    : 'v9.0'
+    });
+        FB.AppEvents.logPageView();
+};
+
+(function(d, s, id){
     var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
+    if (d.getElementById(id)) {return;}
     js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-
-   window.fbAsyncInit = function() {
-     FB.init({
-       appId      : '1848776875399776',
-       cookie     : true,  // enable cookies to allow the server to access 
-                           // the session
-       xfbml      : true,  // parse social plugins on this page
-       version    : 'v2.8' // use graph api version 2.8
-     });
-	  FB.getLoginStatus(function(response) {
-		  console.log("FB.getLoginStatus: ");
-		  console.dir(response);
-		  FBlogin(response);
-	  });
-
-
-   }
-   function checkLoginState() {
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+<script>
+function checkLoginState() {
     FB.getLoginStatus(function(response) {
       statusChangeCallback(response);
     });
@@ -170,7 +167,8 @@
 
     });
    }
-	
+checkLoginState();
+
    </script>
 </body>
 </html>

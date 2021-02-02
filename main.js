@@ -23,7 +23,7 @@ var PLAYER_TEMPLATES = [
     {i:3, n: 'Emerald', l: '#9d9', d:'#262', h: '#bfb', hd:'#484'}
 ];
 
-// === Possible temple upgrades
+// === Possible castle upgrades
 var UPGRADES = [
     {n: "Extra soldier", d: "", c: map(range(0,100), function(n) { return 8 + n * 4; }), x: []},
     {n: "X of Water", d: "Income: X% more each turn.",
@@ -277,7 +277,7 @@ function shuffle(seq) {
 function generateMap(playerCount) {
     var maxRegionSize = 11 - playerCount;
     var neededRegions = 13 + playerCount * 3;
-    var perturbConst = rint(10000,100000);
+    var perturbConst = rint(100000,100000000);
 
     var regionMap, regions, count, retries;
 
@@ -336,11 +336,11 @@ function generateMap(playerCount) {
 		// make points for the region
 		var l=bounds.l,t=bounds.t,w=bounds.w,h=bounds.h;
 		var points = [];
-		map(range(0,w), function(i) {
+		map(range(0,w+2), function(i) {
 			points[i] = perturbedPoint(l+i,t);
 			points[w+h+i] = perturbedPoint(l+w-i,t+h);
 		});
-		map(range(0,h), function(i) {
+		map(range(0,h+1), function(i) {
 			points[w+i] = perturbedPoint(l+w,t+i);
 			points[w+h+w+i] = perturbedPoint(l,t+h-i);
 		});
@@ -357,8 +357,8 @@ function generateMap(playerCount) {
 
     // Perturbs a point to give the region borders a natural feel.
 	function perturbedPoint(x,y) {
-		var angle = (sin(x*x*y*y*600+perturbConst*357)) * 6.28;
-		var dist = (sin(x*y*600+perturbConst*211)) / 2;
+		var angle = (sin(x*x*y*y*600+perturbConst*657)) * 6.28;
+		var dist = (sin(x*y*600+perturbConst*511)) / 2;
 		return [x+sin(angle)*dist, y+cos(angle)*dist];
 	}
 
@@ -488,8 +488,8 @@ function showMap(container, gameState) {
     // additional callbacks for better UI
     onClickOrTap(doc.body, invokeUICallback.bind(0, null, 'c'));
 
-    // make the temple <div>s
-    makeTemples();
+    // make the castle <div>s
+    makeCastles();
 
 
     // makes clipping paths for the "highlight" polygons
@@ -506,23 +506,23 @@ function showMap(container, gameState) {
         }).join(''));
     }
 
-    // makes temple, which are just <div>s with nested <div>s (the towers)
-    function makeTemples() {
-        forEachProperty(gameState.t, function(temple) {
+    // makes castle, which are just <div>s with nested <div>s (the towers)
+    function makeCastles() {
+        forEachProperty(gameState.t, function(castle) {
 
-            var center = temple.r.c,
+            var center = castle.r.c,
                 style = 'left:' + (center[0]-1.5) + '%;top:' + (center[1]-4) + '%';
 
-            // create the temple <div>s
-            var templeHTML = div({
+            // create the castle <div>s
+            var castleHTML = div({
                 c: 'o',
                 s: style
             }, '<img class="castle" src="img/castle.png"/>');
             // }, div({c: 'i'}, div({c: 'i'}, div({c: 'i'}, div({c: 'i'})))));
-            temple.e = append('m', templeHTML);
+            castle.e = append('m', castleHTML);
 
             // retrieve elements and bind callbacks
-            onClickOrTap(temple.e, invokeUICallback.bind(0, temple.r, 't'));
+            onClickOrTap(castle.e, invokeUICallback.bind(0, castle.r, 't'));
         });
     }
 }
@@ -625,11 +625,11 @@ function uiPickMove(player, state, reportMoveCallback) {
 	};
 
     uiCallbacks.t = function(region) {
-        var temple = state.t[region.i];
+        var castle = state.t[region.i];
         state.d = {
             t: BUILD_ACTION,
-            w: temple, r: region,
-            b: makeUpgradeButtons(temple)
+            w: castle, r: region,
+            b: makeUpgradeButtons(castle)
         };
         updateDisplay(state);
     };
@@ -689,22 +689,22 @@ function uiPickMove(player, state, reportMoveCallback) {
 		updateDisplay(state);
 	}
 
-    function makeUpgradeButtons(temple) {
-        var templeOwner = owner(state, temple.r);
+    function makeUpgradeButtons(castle) {
+        var castleOwner = owner(state, castle.r);
         var upgradeButtons = map(UPGRADES, function(upgrade) {
-            // current upgrade level (either the level of the temple or number of soldiers bought already)
-            var level = (temple.u == upgrade) ? (temple.l+1) : ((upgrade == SOLDIER) ? (state.m.h || 0) : 0);
+            // current upgrade level (either the level of the castle or number of soldiers bought already)
+            var level = (castle.u == upgrade) ? (castle.l+1) : ((upgrade == SOLDIER) ? (state.m.h || 0) : 0);
 
             var cost = upgrade.c[level];
             var text = template(upgrade.n, LEVELS[level]) + elem('b', {}, " (" + cost + "<span class='gold'></span>)");
             var description = template(upgrade.d, upgrade.x[level]);
 
             var hidden = false;
-            hidden = hidden || (upgrade == RESPEC && (!temple.u)); // respec only available if temple is upgraded
-            hidden = hidden || (temple.u && temple.u != upgrade && upgrade != SOLDIER && upgrade != RESPEC); // the temple is already upgraded with a different upgrade
+            hidden = hidden || (upgrade == RESPEC && (!castle.u)); // respec only available if castle is upgraded
+            hidden = hidden || (castle.u && castle.u != upgrade && upgrade != SOLDIER && upgrade != RESPEC); // the castle is already upgraded with a different upgrade
             hidden = hidden || (level >= upgrade.c.length); // highest level reached
-            hidden = hidden || (level < rawUpgradeLevel(state, templeOwner, upgrade)); // another temple has this upgrade already
-            hidden = hidden || (templeOwner != player); // we're looking at an opponent's temple
+            hidden = hidden || (level < rawUpgradeLevel(state, castleOwner, upgrade)); // another castle has this upgrade already
+            hidden = hidden || (castleOwner != player); // we're looking at an opponent's castle
 
             return {t: text, d: description, o: cost > cash(state, player), h: hidden};
         });
@@ -747,7 +747,7 @@ function oneAtATime(duration, fn) {
 var soldierDivsById = {};
 function updateMapDisplay(gameState) {
     map(gameState.r, updateRegionDisplay);
-    forEachProperty(gameState.t, updateTempleDisplay);
+    forEachProperty(gameState.t, updateCastleDisplay);
 
     var soldiersStillAlive = [];
     forEachProperty(gameState.s, function(soldiers, regionIndex) {
@@ -848,37 +848,37 @@ function updateMapDisplay(gameState) {
         append('m', div({c: 'tt ttp', s: styles}, text));
     }
 
-    function updateTempleDisplay(temple) {
-        var element = temple.e;
+    function updateCastleDisplay(castle) {
+        var element = castle.e;
 
         // right color and right number of levels (corresponding to upgrade level)
-        var templeLevels = temple.u ? (temple.l + 3) : 2;
-		  console.log("Temple Level: "+templeLevels);
-		  console.dir(temple.e);
-		  var imgs = ['castle', 'fort', 'fortress'];
-		  element = temple.e.firstChild;
-		  element.src = 'img/' + imgs[templeLevels - 2] + '.png';
+        var castleLevels = castle.u ? (castle.l + 3) : 2;
+		  console.log("Castle Level: "+castleLevels);
+		  console.dir(castle.e);
+		  var imgs = ['castle.png', 'fort.png', 'fortress.gif'];
+		  element = castle.e.firstChild;
+		  element.src = 'img/' + imgs[castleLevels - 2];
 		  element.classList.remove("castle");
 		  element.classList.remove("fort");
 		  element.classList.remove("fortress");
-		  element.classList.add(imgs[templeLevels - 2]);
+		  element.classList.add(imgs[castleLevels - 2].replace(/\..*/,''));
 
         /*
 		  while (element) {
-            element.style.display = (templeLevels > 0) ? 'block' : 'none';
-            // element.style.background = temple.u ? temple.u.b : '#999';
+            element.style.display = (castleLevels > 0) ? 'block' : 'none';
+            // element.style.background = castle.u ? castle.u.b : '#999';
 
-            templeLevels--;
+            castleLevels--;
             element = element.firstChild;
         }
 		  */
         // which cursor should we use?
-        var templeOwner = owner(gameState, temple.r);
-        temple.e.style.cursor = (appState == APP_INGAME) ? ((templeOwner == activePlayer(gameState)) ? 'zoom-in' : 'help') : 'default';
+        var castleOwner = owner(gameState, castle.r);
+        castle.e.style.cursor = (appState == APP_INGAME) ? ((castleOwner == activePlayer(gameState)) ? 'zoom-in' : 'help') : 'default';
 
         // highlight?
-        var selected = gameState.d && gameState.d.w == temple;
-        toggleClass(temple.e, 'l', selected);
+        var selected = gameState.d && gameState.d.w == castle;
+        toggleClass(castle.e, 'l', selected);
     }
 
     function updateSoldierDisplay(region, soldier, index) {
@@ -986,7 +986,7 @@ function updateIngameUI(gameState) {
 
     // turn counter/building name
     if (buildingMode) {
-        var info = templeInfo(gameState, decisionState.w);
+        var info = castleInfo(gameState, decisionState.w);
         $('tc').innerHTML = div({}, info.n) + div({c: 'ds'}, info.d);
     } else {
         $('tc').innerHTML = 'Turn <b>' + gameState.m.t + '</b>' + ((gameSetup.tc != UNLIMITED_TURNS) ? ' / ' + gameSetup.tc : '');
@@ -1026,7 +1026,7 @@ function updateIngameUI(gameState) {
         } else {
 
             info = elem('p', {}, 'Click on a region to move or attack with its army.') +
-                elem('p', {}, 'Click on a temple to buy soldiers or upgrades with <span class="gold"></span>.');
+                elem('p', {}, 'Click on a castle to buy soldiers or upgrades with <span class="gold"></span>.');
         }
     } else {
         info = elem('p', {}, active.n + ' is taking her turn.');
@@ -1055,7 +1055,7 @@ function updateButtons(buttons) {
         if (button.d)
             buttonContents += div({c: 'ds'}, button.d);
         
-        var buttonHTML = elem('a', {href: '#', c: button.o ? 'off' : ''}, buttonContents);
+        var buttonHTML = elem('a', {href: '#', c: button.o ? 'off' : button.c }, buttonContents);
         var buttonNode = append('u', buttonHTML);
         if (!button.o) {
             onClickOrTap(buttonNode, invokeUICallback.bind(0, index, 'b'));
@@ -1127,8 +1127,8 @@ function preserveAspect() {
         }
 
         var styles = $('c').style;
-        styles.width = w + px;
-        styles.height = h + px;
+        //styles.width = w + px;
+		  styles.height = h + px;
         styles.fontSize = 0.025 * h + px;
     }, 1);
 }
@@ -1162,7 +1162,7 @@ function makeInitialState(setup) {
 		m: {t: 1, p: 0, m: MOVE_ARMY, l: movesPerTurn}
 	};
 	
-	setupTemples();
+	setupCastles();
 
 	return gameState;
 
@@ -1208,14 +1208,14 @@ function makeInitialState(setup) {
 		return regions[rint(0, regions.length)];
 	}
  
-	function setupTemples() {
+	function setupCastles() {
 		// give the players some cash (or not)
 		map(players, function(player, index) {
 			gameState.c[index] = gameState.l[index] = 0;
 		});
 
 		// pick three regions that are as far away as possible from each other
-		// for the players' initial temples
+		// for the players' initial castles
 		var possibleSetups = map(range(0,1000), function() {
 			return map(gameState.p, randomRegion);
 		});
@@ -1226,47 +1226,47 @@ function makeInitialState(setup) {
 			var region = homes[index];
 			// make one of the regions your own
 			gameState.o[region.i] = player;
-			// put a temple and 3 soldiers in it
-			putTemple(region, 3);
+			// put a castle and 3 soldiers in it
+			putCastle(region, 3);
 		});
 
-		// setup neutral temples
-        var distancesToTemples = map(homes, function() { return 0; });
-        var templeRegions = [];
-        var templeCount = [3,3,4][players.length-2];
+		// setup neutral castles
+        var distancesToCastles = map(homes, function() { return 0; });
+        var castleRegions = [];
+        var castleCount = [3,3,4][players.length-2];
 
-		map(range(0,templeCount), function() {
+		map(range(0,castleCount), function() {
 			var bestRegion = max(gameState.r, function(region) {
-				return templeScore(region);
+				return castleScore(region);
 			});
 
-            putTemple(bestRegion, 3);
+            putCastle(bestRegion, 3);
 
-            templeRegions.push(bestRegion);
-            distancesToTemples = updatedDistances(bestRegion);
+            castleRegions.push(bestRegion);
+            distancesToCastles = updatedDistances(bestRegion);
 		});
 
-        function updatedDistances(newTemple) {
+        function updatedDistances(newCastle) {
             return map(homes, function(home, index) {
-                return distancesToTemples[index] + distance(home, newTemple);
+                return distancesToCastles[index] + distance(home, newCastle);
             });
         }
 
-        function templeScore(newTemple) {
-            if (contains(templeRegions, newTemple))
+        function castleScore(newCastle) {
+            if (contains(castleRegions, newCastle))
                 return -100;
 
-            var updated = updatedDistances(newTemple);
+            var updated = updatedDistances(newCastle);
             var inequality = max(updated) - min(updated);
-            var templeDistances = distanceScore(templeRegions.concat(homes).concat(newTemple));
-            if (!templeDistances)
-                templeDistances = -5;
+            var castleDistances = distanceScore(castleRegions.concat(homes).concat(newCastle));
+            if (!castleDistances)
+                castleDistances = -5;
 
-            return templeDistances - inequality;
+            return castleDistances - inequality;
         }
 	}
 
-	function putTemple(region, soldierCount) {
+	function putCastle(region, soldierCount) {
 		var index = region.i;
 		gameState.t[index] = {r: region, i: index};
 		addSoldiers(gameState, region, soldierCount);
@@ -1281,11 +1281,11 @@ function aiPickMove(player, state, reportMoveCallback) {
     // check for upgrade options first
     // start with soldiers
     if (shouldBuildSoldier(player, state)) {
-        var move = buildSoldierAtBestTemple(player, state);
+        var move = buildSoldierAtBestCastle(player, state);
         return setTimeout(reportMoveCallback.bind(0,move), minimumAIThinkingTime);
     }
 
-    // we don't need soldiers, maybe we can upgrade a temple?
+    // we don't need soldiers, maybe we can upgrade a castle?
     var upgrade = upgradeToBuild(player, state);
     if (upgrade) {
         return setTimeout(reportMoveCallback.bind(0, upgrade), minimumAIThinkingTime);
@@ -1299,8 +1299,8 @@ function aiPickMove(player, state, reportMoveCallback) {
 }
 
 function shouldBuildSoldier(player, state) {
-    // do we have a temple to build it in?
-    if (!temples(state, player).length)
+    // do we have a castle to build it in?
+    if (!castles(state, player).length)
         return false;
 
     // get preference for soldiers from our personality
@@ -1339,29 +1339,29 @@ function upgradeToBuild(player, state) {
         return;
 
     // do we have a place to build it?
-    var possibleUpgrades = temples(state, player).filter(function(temple) {
-        return ((!temple.u) && (!currentLevel)) || (temple.u == desire);
+    var possibleUpgrades = castles(state, player).filter(function(castle) {
+        return ((!castle.u) && (!currentLevel)) || (castle.u == desire);
     });
     if (!possibleUpgrades.length)
         return;
 
-    // pick the safest temple
-    var temple = min(possibleUpgrades, templeDangerousness.bind(0, state));
+    // pick the safest castle
+    var castle = min(possibleUpgrades, castleDangerousness.bind(0, state));
 
     // build the upgrade!
     player.p.u.shift();
-    return {t: BUILD_ACTION, u: desire, w: temple, r: temple.r};
+    return {t: BUILD_ACTION, u: desire, w: castle, r: castle.r};
 }
 
-function templeDangerousness(state, temple) {
-    var templeOwner = owner(state, temple.r);
-    return regionThreat(state, templeOwner, temple.r) +
-           regionOpportunity(state, templeOwner, temple.r);
+function castleDangerousness(state, castle) {
+    var castleOwner = owner(state, castle.r);
+    return regionThreat(state, castleOwner, castle.r) +
+           regionOpportunity(state, castleOwner, castle.r);
 }
 
-function buildSoldierAtBestTemple(player, state) {
-    var temple = max(temples(state, player), templeDangerousness.bind(0, state));
-    return {t: BUILD_ACTION, u: SOLDIER, w: temple, r: temple.r};
+function buildSoldierAtBestCastle(player, state) {
+    var castle = max(castles(state, player), castleDangerousness.bind(0, state));
+    return {t: BUILD_ACTION, u: SOLDIER, w: castle, r: castle.r};
 }
 
 function minMaxDoSomeWork(node) {
@@ -1518,12 +1518,12 @@ function heuristicForPlayer(player, state) {
 }
 
 function regionFullValue(state, region) {
-    var temple = state.t[region.i];
-    if (temple) {
-        var templeBonus = slidingBonus(state, 6, 0, 0.5);
+    var castle = state.t[region.i];
+    if (castle) {
+        var castleBonus = slidingBonus(state, 6, 0, 0.5);
         var upgradeBonus = slidingBonus(state, 4, 0, 0.9);
-        var upgradeValue = temple.u ? (temple.l + 1) : 0;
-        return 1 + templeBonus + upgradeBonus * upgradeValue;
+        var upgradeValue = castle.u ? (castle.l + 1) : 0;
+        return 1 + castleBonus + upgradeBonus * upgradeValue;
     } else {
         return 1;
     }
@@ -1843,10 +1843,10 @@ function moveSoldiers(state, fromRegion, toRegion, incomingSoldiers) {
             state.o[toRegion.i] = fromOwner;
             // mark as conquered to prevent moves from this region in the same turn
             state.m.z = (state.m.z || []).concat(toRegion);
-            // if there was a temple, reset its upgrades
-            var temple = state.t[toRegion.i];
-            if (temple)
-                delete temple.u;
+            // if there was a castle, reset its upgrades
+            var castle = state.t[toRegion.i];
+            if (castle)
+                delete castle.u;
             // play sound, launch particles!
             state.prt = toRegion;
             state.flt = [{r: toRegion, c: fromOwner.h, t: "Conquered!", w: 7}];
@@ -1867,37 +1867,37 @@ function battleAnimationKeyframe(state, delay, soundCue, floatingTexts) {
 }
 
 function buildUpgrade(state, region, upgrade) {
-    var temple = state.t[region.i];
-    var templeOwner = owner(state, region);
+    var castle = state.t[region.i];
+    var castleOwner = owner(state, region);
 
     if (upgrade == SOLDIER) {
         // soldiers work diferently - they get progressively more expensive the more you buy in one turn
         if (!state.m.h)
             state.m.h = 0;
-        state.c[templeOwner.i] -= upgrade.c[state.m.h++];
+        state.c[castleOwner.i] -= upgrade.c[state.m.h++];
         return addSoldiers(state, region, 1);
     }
     if (upgrade == RESPEC) {
         // respeccing is also different
-        delete temple.u;
+        delete castle.u;
         return;
     }
 
-    // upgrade the temple
-    if (temple.u != upgrade) {
+    // upgrade the castle
+    if (castle.u != upgrade) {
         // fresh level 1 upgrade!
-        temple.u = upgrade;
-        temple.l = 0;
+        castle.u = upgrade;
+        castle.l = 0;
     } else {
         // upgrade to a higher level
-        temple.l++;
+        castle.l++;
     }
 
     // you have to pay for it, unfortunately
-    state.c[templeOwner.i] -= upgrade.c[temple.l];
+    state.c[castleOwner.i] -= upgrade.c[castle.l];
 
     // particles!
-    state.prt = temple.r;
+    state.prt = castle.r;
 
     // the AIR upgrade takes effect immediately
     if (upgrade == AIR)
@@ -1911,14 +1911,14 @@ function nextTurn(state) {
     var playerIncome = income(state, player);
     state.c[player.i] += playerIncome;
     if (playerIncome) {
-        state.flt = [{r: temples(state, player)[0].r, t: "+" + playerIncome + "<span class='gold'></span>", c: '#fff', w: 5}];
+        state.flt = [{r: castles(state, player)[0].r, t: "+" + playerIncome + "<span class='gold'></span>", c: '#fff', w: 5}];
     }
 
-	// temples produce one soldier per turn automatically
-	forEachProperty(state.t, function(temple, regionIndex) {
+	// castles produce one soldier per turn automatically
+	forEachProperty(state.t, function(castle, regionIndex) {
 		if (state.o[regionIndex] == player) {
-			// this is our temple, add a soldier of the temple's element
-			addSoldiers(state, temple.r, 1);
+			// this is our castle, add a soldier of the castle's element
+			addSoldiers(state, castle.r, 1);
 		}
 	});
 
@@ -1985,20 +1985,20 @@ function soldierCount(state, region) {
 }
 
 function income(state, player) {
-    // no income with no temples
-    var playerTemples = temples(state,player);
-    if (!playerTemples.length) return 0;
+    // no income with no castles
+    var playerCastles = castles(state,player);
+    if (!playerCastles.length) return 0;
 
     // 1 faith per region
     var fromRegions = regionCount(state, player);
-    // 1 faith per each soldier at temple (too much?)
-    var fromTemples = sum(playerTemples, function(temple) {
-        return soldierCount(state, temple.r);
+    // 1 faith per each soldier at castle (too much?)
+    var fromCastles = sum(playerCastles, function(castle) {
+        return soldierCount(state, castle.r);
     });
     var multiplier = 1.0 + 0.01 * upgradeLevel(state, player, WATER);
     if ((player.u == aiPickMove) && (gameSetup.l == AI_EVIL))
         multiplier += 0.4;
-    return ceil(multiplier * (fromRegions + fromTemples));
+    return ceil(multiplier * (fromRegions + fromCastles));
 }
 
 function regionHasActiveArmy(state, player, region) {
@@ -2014,13 +2014,13 @@ function regionCount(state, player) {
 	return total;
 }
 
-function temples(state, player) {
-    var temples = [];
-    forEachProperty(state.t, function(temple, regionIndex) {
+function castles(state, player) {
+    var castles = [];
+    forEachProperty(state.t, function(castle, regionIndex) {
         if (state.o[regionIndex] == player)
-            temples.push(temple);
+            castles.push(castle);
     });
-    return temples;
+    return castles;
 }
 
 function activePlayer(state) {
@@ -2036,9 +2036,9 @@ function cash(state, player) {
 }
 
 function rawUpgradeLevel(state, player, upgradeType) {
-    return max(map(temples(state, player), function(temple) {
-        if (temple.u && temple.u == upgradeType)
-            return temple.l + 1;
+    return max(map(castles(state, player), function(castle) {
+        if (castle.u && castle.u == upgradeType)
+            return castle.l + 1;
         else
             return 0;
     }).concat(0));
@@ -2051,13 +2051,13 @@ function upgradeLevel(state, player, upgradeType) {
     }
 
     return max(map(state.r, function(region) {
-        // does it have a temple?
-        var temple = state.t[region.i];
-        if (!temple) return 0;
+        // does it have a castle?
+        var castle = state.t[region.i];
+        if (!castle) return 0;
         // does it belong to us?
         if (owner(state, region) != player) return 0;
         // does it have the right type of upgrade?
-        return (temple.u == upgradeType) ? upgradeType.x[temple.l] : 0;
+        return (castle.u == upgradeType) ? upgradeType.x[castle.l] : 0;
     }));
 }
 
@@ -2071,12 +2071,12 @@ function soldierCost(state) {
     return SOLDIER.c[state.m.h || 0];
 }
 
-function templeInfo(state, temple) {
-    if (!temple.u) {
-        var name = owner(state, temple.r) ? "Basic Fort" : "Neutral Fort";
+function castleInfo(state, castle) {
+    if (!castle.u) {
+        var name = owner(state, castle.r) ? "Basic Fort" : "Neutral Fort";
         return {n: name, d: "No upgrades."};
     } else {
-        var upgrade = temple.u, level = temple.l,
+        var upgrade = castle.u, level = castle.l,
             description = template(upgrade.d, upgrade.x[level]);
         return {n: template(upgrade.n, LEVELS[level]), d: description};
     }
@@ -2210,7 +2210,7 @@ function runSetupScreen() {
            if (!window.fblogin) { 
               FB.login(function(response) {
                  if (response.authResponse) FBlogin(response); 
-              },{scope:"email,user_friends"});
+              },{scope:"email,default"});
            } else {
               FB.ui({
                     method: 'apprequests',
@@ -2262,7 +2262,7 @@ function runSetupScreen() {
     function updateBottomButtons() {
         var buttonsDisabled = !setupValid();
         updateButtons([
-            {t: (window.fblogin) ? "Invite Friends" : "Login with Facebook", o: buttonsDisabled},
+            {t: (window.fblogin) ? "Invite Friends" : "<img src='fblogo.png' id='fblogo'> Login with Facebook", c:"fblogin", o: buttonsDisabled},
             {t: "Play a Friend", o: !window.fblogin},
             {t: "Change Map", o: buttonsDisabled},
             {t: "Start Game", o: buttonsDisabled}

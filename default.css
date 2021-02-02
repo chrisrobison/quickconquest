@@ -17,6 +17,8 @@ svg {
    margin: auto;
    perspective: 50em;
       -webkit-perspective: 50em;
+      user-select:none;
+      -webkit-user-select: none;
 }
 #o,#m,#u {
    position: absolute;
@@ -373,8 +375,26 @@ a:hover {
 	margin-left:-0.6em;
 }
 .fortress {
-	margin-top:-0.7em;
-	width:64px;
-	height:64px;
-	margin-left:-0.6em;
+	margin-top: -2em;
+	width: 100px;
+	height: 100px;
+	margin-left: -1.3em;
+}
+#fblogo {
+    height:2rem;
+    width:2rem;
+    float:left;
+    position:relative;
+    top:-.25em;
+}
+.fblogin {
+    height:1.4em;
+    background-color: #1877F2;
+    color:#fff;
+    font-weight:600;
+    padding-top:1rem;
+}
+a.fblogin:hover {
+    background-color:#1877f2;
+    transform: translate3d(0,0,1em);
 }
